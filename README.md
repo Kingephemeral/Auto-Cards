@@ -18,10 +18,11 @@ Auto-Cards is both free and open source for anyone to use within their own scena
 1. Use the [AI Dungeon website](https://aidungeon.com/) on PC (or view as desktop if mobile-only)
 2. [Create a new scenario](https://help.aidungeon.com/faq/what-are-scenarios) or edit one of your existing scenarios
 3. Open the `DETAILS` tab at the top while editing your scenario
-4. Scroll to the bottom and select `EDIT SCRIPTS`
-5. Select the `Input` tab on the left
-6. Delete all code within said tab
-7. Copy and paste the following code into your empty `Input` tab:
+4. Scroll down to `Scripting` and toggle ON → `Scripts Enabled`
+5. Select `EDIT SCRIPTS`
+6. Select the `Input` tab on the left
+7. Delete all code within said tab
+8. Copy and paste the following code into your empty `Input` tab:
 ```javascript
 // Your "Input" tab should look like this
 const modifier = (text) => {
@@ -32,9 +33,9 @@ const modifier = (text) => {
 };
 modifier(text);
 ```
-8. Select the `Context` tab on the left
-9. Delete all code within said tab
-10. Copy and paste the following code into your empty `Context` tab:
+9. Select the `Context` tab on the left
+10. Delete all code within said tab
+11. Copy and paste the following code into your empty `Context` tab:
 ```javascript
 // Your "Context" tab should look like this
 const modifier = (text) => {
@@ -45,9 +46,9 @@ const modifier = (text) => {
 };
 modifier(text);
 ```
-11. Select the `Output` tab on the left
-12. Delete all code within said tab
-13. Copy and paste the following code into your empty `Output` tab:
+12. Select the `Output` tab on the left
+13. Delete all code within said tab
+14. Copy and paste the following code into your empty `Output` tab:
 ```javascript
 // Your "Output" tab should look like this
 const modifier = (text) => {
@@ -58,14 +59,15 @@ const modifier = (text) => {
 };
 modifier(text);
 ```
-14. Select the `Library` tab on the left
-15. Delete all code within said tab
-16. Open my full Library code (hyperlink below) in a new browser tab
+15. Select the `Library` tab on the left
+16. Delete all code within said tab
+17. Open my full Library code (hyperlink below) in a new browser tab
 - [Library code](./src/library.js)
-17. Copy my *full* code from the page above and paste into your empty `Library` tab
-18. Click the big yellow `SAVE` button in the top right corner
-19. And you're done!
-20. Keep in mind that any adventures played from your scenario will include Auto-Cards (this also applies retroactively)
+18. Copy my *full* code from the page above and paste into your empty `Library` tab
+19. Click the big yellow `SAVE` button in the top right corner
+20. And you're done!
+
+Keep in mind that any adventures played from your scenario will include Auto-Cards (this also applies retroactively)
 ## Useful Links
 ### Simple demo scenario
 - [Auto-Cards](https://play.aidungeon.com/scenario/Ddt0Akd-lVtj/auto-cards)
