@@ -1718,6 +1718,20 @@ function AutoCards(inHook, inText, inStop) {
             switch(HOOK) {
             case "input": {
                 // AutoCards was called within the input modifier
+                            //—————————————————————————————————————————————————————————————
+            // LifeSim Auto-Cards V1
+            // Check the player's original input for purchases and gifts.
+            //—————————————————————————————————————————————————————————————
+
+            if (
+                LIFESIM_ENABLED
+                && !AC.signal.emergencyHalt
+                && typeof text === "string"
+                && !/\/\s*A\s*C\b/i.test(text)
+            ) {
+                processLifeSimInput(text);
+            }
+
                 const [libraryCards, inputCards, logCard] = collectCards(
                     templates.library,
                     templates.input,
