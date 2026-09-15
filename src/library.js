@@ -513,6 +513,117 @@ function AutoCards(inHook, inText, inStop) {
     const Words = hoistWords();
     const StringsHashed = hoistStringsHashed();
     const Internal = hoistInternal();
+        //—————————————————————————————————————————————————————————————————————————————————
+    // LifeSim Auto-Cards V1 — input detection
+    //—————————————————————————————————————————————————————————————————————————————————
+
+    function cleanLifeSimName(name) {
+        return String(name || "")
+            .trim()
+            .replace(/\s+/g, " ")
+            .replace(/[.,!?]+$/, "");
+    }
+
+    function extractLifeSimPrice(text) {
+        const match = String(text || "").match(
+            /(?:£|\$|€|¥)\s*[\d,]+(?:\.\d{1,2})?/
+        );
+
+        return match ? match[0] : "";
+    }
+
+    function cleanLifeSimItem(item) {
+        return String(item || "")
+            .trim()
+            .replace(/\s+/g, " ")
+            .replace(/[.,!?]+$/, "")
+            .replace(/^(?:a|an|the)\s+/i, "")
+            .replace(
+                /^(?:£|\$|€|¥)\s*[\d,]+(?:\.\d{1,2})?\s+/,
+                ""
+            )
+            .trim();
+    }
+
+    function detectLifeSimEvent(input) {
+        if (!LIFESIM_ENABLED || typeof input !== "string") {
+            return null;
+        }
+
+        const sourceText = input
+            .replace(/[“”]/g, '"')
+            .replace(/[‘’]/g, "'")
+            .trim();
+
+        if (!sourceText) {
+            return null;
+        }
+
+        // Ignore Auto-Cards commands.
+        if (/\/\s*A\s*C\b/i.test(sourceText)) {
+            return null;
+        }
+
+        let match;
+
+        // Example:
+        // I buy Maya a £2,000 Cartier bracelet.
+        // I give Maya a gold necklace.
+        match = sourceText.match(
+            /\b(buy|bought|purchase|purchased|order|ordered|get|got|give|gave|gift|gifted)\s+([A-Za-z][A-Za-z'-]*(?:\s+[A-Za-z][A-Za-z'-]*){0,2})\s+(?:a|an|the)\s+(.+?)(?:[.!?]|$)/i
+        );
+
+        if (match) {
+            const verb = match[1].toLowerCase();
+
+            return {
+                action: LIFESIM_GIFT_VERBS.includes(verb)
+                    ? "gift"
+                    : "purchase",
+
+                recipient: cleanLifeSimName(match[2]),
+                item: cleanLifeSimItem(match[3]),
+                price: extractLifeSimPrice(sourceText),
+                sourceText: sourceText
+            };
+        }
+
+        // Example:
+        // I buy a Cartier bracelet for Maya.
+        match = sourceText.match(
+            /\b(buy|bought|purchase|purchased|order|ordered|get|got)\s+(?:a|an|the)\s+(.+?)\s+for\s+([A-Za-z][A-Za-z'-]*(?:\s+[A-Za-z][A-Za-z'-]*){0,2})(?:[.!?]|$)/i
+        );
+
+        if (match) {
+            return {
+                action: "purchase",
+                recipient: cleanLifeSimName(match[3]),
+                item: cleanLifeSimItem(match[2]),
+                price: extractLifeSimPrice(sourceText),
+                sourceText: sourceText
+            };
+        }
+
+        // Example:
+        // I give a necklace to Maya.
+        match = sourceText.match(
+            /\b(give|gave|gift|gifted)\s+(?:a|an|the)\s+(.+?)\s+to\s+([A-Za-z][A-Za-z'-]*(?:\s+[A-Za-z][A-Za-z'-]*){0,2})(?:[.!?]|$)/i
+        );
+
+        if (match) {
+            return {
+                action: "gift",
+                recipient: cleanLifeSimName(match[3]),
+                item: cleanLifeSimItem(match[2]),
+                price: extractLifeSimPrice(sourceText),
+                sourceText: sourceText
+            };
+        }
+
+        return null;
+    }
+
+    //—————————————————————————————————————————————————————————————————————————————————
     // AutoCards has an explicitly immutable domain: HOOK, TEXT, and STOP
     const HOOK = inHook;
     const TEXT = ((typeof inText === "string") && inText) || "\n";
