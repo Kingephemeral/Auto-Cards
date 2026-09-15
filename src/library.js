@@ -121,6 +121,32 @@ function AutoCards(inHook, inText, inStop) {
     // Should titles mentioned in the "opening" plot component be banned from future card generation by default?
     const DEFAULT_BAN_TITLES_FROM_OPENING = true
     // (true or false)
+    //—————————————————————————————————————————————————————————————————————————————————
+    // LifeSim Auto-Cards V1 settings
+    //—————————————————————————————————————————————————————————————————————————————————
+
+    // Enable or disable the LifeSim extension?
+    const LIFESIM_ENABLED = true
+
+    // Verbs that indicate a purchase or item acquisition.
+    const LIFESIM_PURCHASE_VERBS = [
+        "buy",
+        "bought",
+        "purchase",
+        "purchased",
+        "order",
+        "ordered",
+        "get",
+        "got"
+    ]
+
+    // Verbs that indicate an item is being given as a gift.
+    const LIFESIM_GIFT_VERBS = [
+        "give",
+        "gave",
+        "gift",
+        "gifted"
+    ]
 
     //—————————————————————————————————————————————————————————————————————————————————
 
