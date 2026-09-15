@@ -548,7 +548,129 @@ function AutoCards(inHook, inText, inStop) {
     function detectLifeSimEvent(input) {
         if (!LIFESIM_ENABLED || typeof input !== "string") {
             return null;
+           // Create a persistent Auto-Card for a detected LifeSim possession.
+    function createLifeSimPossessionCard(event) {
+        if (
+            !event
+            || !event.item
+            || !event.recipient
+        ) {
+            return false;
         }
+
+        const titleData = formatTitle(event.item);
+        const title = titleData.newTitle;
+
+        if (!title || title.length < 3) {
+            return false;
+        }
+
+        // Check whether this possession already has an Auto-Card.
+        // V1 suppresses duplicates rather than regenerating the card.
+        const existingCard = Internal.getCard(card => {
+            if (
+                !card
+                || typeof card.title !== "string"
+                || typeof card.entry !== "string"
+            ) {
+                return false;
+            }
+
+            const existingTitle = formatTitle(card.title).newTitle;
+
+            return (
+                existingTitle.toLowerCase() === title.toLowerCase()
+                && card.entry.startsWith("{title: ")
+            );
+        });
+
+        if (existingCard) {
+            return true;
+        }
+
+        const owner = event.recipient;
+
+        const transactionText =
+            event.action === "gift"
+                ? "The player character gave " + title + " to " + owner + " as a gift."
+                : "The player character purchased " + title + " for " + owner + ".";
+
+        const priceText =
+            event.price
+                ? " The explicitly stated value was " + event.price + "."
+                : "";
+
+        const entryStart =
+            owner + " currently owns " + title + ". "
+            + transactionText
+            + priceText;
+
+        const lifeSimPrompt = prose(
+            "-----",
+            "",
+            "<SYSTEM>",
+            "# Stop the story and write a concise factual reference entry for %{title}.",
+            "- This is a persistent possession in a realistic LifeSim.",
+            "- Use only information explicitly established by the story or supplied below.",
+            "- Do not invent specifications, history, price, ownership, appearance, features, or events.",
+            "- Clearly preserve who currently owns the item.",
+            "- Preserve who bought or gifted it when established.",
+            "- Preserve its value only when a value was explicitly stated.",
+            "- Focus on information useful for future continuity.",
+            "- Keep the entry brief.",
+            "- Do not continue the story.",
+            "- Do not create dialogue or actions for the player character.",
+            "</SYSTEM>",
+            "Continue the factual entry for %{title}:",
+            "%{entry}"
+        );
+
+        const promptDetails = [
+            "Detected LifeSim event: " + event.sourceText,
+            "Possession: " + title,
+            "Current owner: " + owner,
+            "Transaction type: " + event.action,
+            event.price
+                ? "Explicit value: " + event.price
+                : "No value was explicitly established."
+        ].join("\n");
+
+        return Internal.generateCard({
+            type: "item",
+            title: title,
+
+            // Only use item-related triggers.
+            // Do NOT use the owner's name as a key because that would
+            // activate this card every time the owner appears.
+            keysStart: title,
+
+            entryStart: entryStart,
+            entryPrompt: lifeSimPrompt,
+            entryPromptDetails: promptDetails,
+
+            memoryStart:
+                owner
+                + " obtained "
+                + title
+                + (event.price ? " valued at " + event.price : "")
+                + ".",
+
+            memoryUpdates: true
+        });
+    }
+
+
+    // Takes the player's input, detects a LifeSim event,
+    // and sends it to the possession-card creator.
+    function processLifeSimInput(input) {
+        const event = detectLifeSimEvent(input);
+
+        if (!event) {
+            return false;
+        }
+
+        return createLifeSimPossessionCard(event);
+    } }
 
         const sourceText = input
             .replace(/[“”]/g, '"')
